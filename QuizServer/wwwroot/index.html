@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Custom Quiz</h1>
+
+    <!-- ✅ Category selection -->
+    <div id="category-container">
+        <label for="category">Choose category:</label>
+        <select id="category">
+            <option value="">-- Select a category --</option>
+        </select>
+        <button id="start-btn">Start Quiz</button>
+    </div>
+
+    <!-- ✅ Question + answers -->
+    <div id="question-container" style="display:none;">
+        <h2 id="question"></h2>
+        <div id="answers"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
