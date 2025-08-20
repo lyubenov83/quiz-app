@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuizServer.Data;
-using QuizServer.Services; // ✅ Include the seeder namespace
+using QuizServer.Services; // Seeder
+using QuizServer.Security; // ✅ Middleware
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔧 Connection string to MySQL
-var connectionString = "Server=localhost;Port=3306;Database=quizdb;Uid=root;Pwd=Summerof2025;";
+// 🔧 MySQL connection
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                      ?? "Server=localhost;Port=3306;Database=quizdb;Uid=root;Pwd=Summerof2025;";
 
 builder.Services.AddDbContext<QuizDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// ✅ Enable JSON enum and List<string> support
+// ✅ JSON setup
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
@@ -27,18 +29,21 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var seeder = new QuestionSeeder(services.GetRequiredService<QuizDbContext>());
-    seeder.SeedQuestions("SeedData/questions.json"); // ✅ Adjust path if needed
+    seeder.SeedQuestions("SeedData/questions.json"); // Adjust path if needed
 }
 
-// ✅ Serve static frontend files from wwwroot
-app.UseDefaultFiles(); // Will load index.html by default
-app.UseStaticFiles();  // Enable serving JS, CSS, etc.
+// ✅ Static front-end (index.html, script.js, style.css under wwwroot)
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// ✅ API-key middleware (protects only /api/questions/normal & /api/questions/survival)
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
